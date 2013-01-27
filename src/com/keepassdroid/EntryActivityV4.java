@@ -21,13 +21,18 @@ package com.keepassdroid;
 
 import java.util.Map;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.android.keepass.R;
+import com.keepassdroid.bluetooth.BluetoothAutotypeActivity;
+import com.keepassdroid.bluetooth.BluetoothConsts;
 import com.keepassdroid.database.PwEntryV4;
 import com.keepassdroid.view.EntrySection;
-
 
 public class EntryActivityV4 extends EntryActivity {
 
@@ -44,24 +49,38 @@ public class EntryActivityV4 extends EntryActivity {
 	@Override
 	protected void fillData() {
 		super.fillData();
-		
+
 		ViewGroup group = (ViewGroup) findViewById(R.id.extra_strings);
-		
-		PwEntryV4 entry = (PwEntryV4) mEntry;
-		
+
+		final PwEntryV4 entry = (PwEntryV4) mEntry;
+
 		// Display custom strings
 		if (entry.strings.size() > 0) {
 			for (Map.Entry<String, String> pair : entry.strings.entrySet()) {
 				String key = pair.getKey();
-				
+
 				if (!PwEntryV4.IsStandardString(key)) {
 					View view = new EntrySection(this, null, key, pair.getValue());
 					group.addView(view);
 				}
 			}
 		}
-			
+
+		Button button = (Button) this.findViewById(R.id.button_bluetooth);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				bluetoothActivity(entry.getUsername(), entry.getPassword());
+			}
+		});
+
 	}
 
+	protected void bluetoothActivity(String username, String password) {
+		Intent intent = new Intent(this, BluetoothAutotypeActivity.class);
+		intent.putExtra(BluetoothConsts.BUNDLE_USERNAME, username);
+		intent.putExtra(BluetoothConsts.BUNDLE_PASSWORD, password);
+		startActivity(intent);
+	}
 
 }
